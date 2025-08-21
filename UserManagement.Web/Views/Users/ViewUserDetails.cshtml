@@ -1,0 +1,13 @@
+﻿@model UserManagement.Web.Models.Users.AddEditUserViewModel
+
+<h2>View User</h2>
+
+<div><strong>Forename:</strong> @Model.Forename</div>
+<div><strong>Surname:</strong> @Model.Surname</div>
+<div><strong>Email:</strong> @Model.Email</div>
+<div>
+	<strong>Date of Birth:</strong> @Model.DateOfBirth?.ToString("dd MMMM yyyy")
+</div>
+<div><strong>Active:</strong> @(Model.IsActive ? "Yes" : "No")</div>
+
+<a asp-action="List" class="btn btn-secondary mt-3">Back to List</a>
