@@ -10,6 +10,7 @@
                 <th>Forename</th>
                 <th>Surname</th>
                 <th>Email</th>
+				<th>DOB</th>
                 <th>Account Active</th>
                 <th style="width: 1px;"></th>
             </tr>
@@ -30,6 +31,9 @@
                     <td>
                         @item.Email
                     </td>
+					<td>
+						@item.DateOfBirth.ToString("dd MMMM yyyy")
+					</td>
                     <td>
                         @(item.IsActive ? "Yes" : "No")
                     </td>
