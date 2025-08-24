@@ -10,4 +10,26 @@
 </div>
 <div><strong>Active:</strong> @(Model.IsActive ? "Yes" : "No")</div>
 
+<h3>User Activity</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Action</th>
+            <th>Performed By</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var log in Model.Logs)
+    {
+        <tr>
+            <td>@log.ActionTypeId</td>
+            <td>@log.UserId</td>
+            <td>@log.DateCreated.ToString("g")</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+
 <a asp-action="List" class="btn btn-secondary mt-3">Back to List</a>

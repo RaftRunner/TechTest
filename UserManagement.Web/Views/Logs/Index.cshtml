@@ -1,0 +1,40 @@
+﻿@model IEnumerable<UserManagement.Data.Entities.LogEntry>
+@{
+    ViewData["Title"] = "Application Logs";
+}
+
+<h2>Application Logs</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Action</th>
+            <th>Timestamp</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var log in Model)
+            {
+                <tr>
+                    <td>@log.User?.Forename @log.User?.Surname</td>
+                    <td>@log.ActionTypeId</td>
+                    <td>@log.DateCreated.ToString("g")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@log.Id" class="btn btn-sm btn-info">View</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5">Nothing has been logged yet... Try creating, updating, or deleting something...</td>
+            </tr>
+        }
+
+    </tbody>
+</table>

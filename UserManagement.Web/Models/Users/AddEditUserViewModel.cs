@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using UserManagement.Data.Entities;
+using UserManagement.Models;
 
 namespace UserManagement.Web.Models.Users;
 
@@ -21,4 +23,7 @@ public class AddEditUserViewModel
     [Required]
     [DataType(DataType.Date)]
     public DateOnly? DateOfBirth { get; set; }
+
+    public User? User { get; set; }
+    public IEnumerable<LogEntry> Logs { get; set; } = new List<LogEntry>();
 }

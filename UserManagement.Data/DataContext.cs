@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using UserManagement.Data.Entities;
 using UserManagement.Models;
+using static UserManagement.Data.Entities.LogEntry;
 
 namespace UserManagement.Data;
 
@@ -29,6 +31,7 @@ public class DataContext : DbContext, IDataContext
         });
 
     public DbSet<User>? Users { get; set; }
+    public DbSet<LogEntry> LogEntries { get; set; }
 
     public IQueryable<TEntity> GetAll<TEntity>() where TEntity : class
         => base.Set<TEntity>();
@@ -49,5 +52,23 @@ public class DataContext : DbContext, IDataContext
     {
         base.Remove(entity);
         SaveChanges();
+    }
+
+    public void AddLog(int userId, ActionType actionTypeId, string message)
+    {
+        var log = new LogEntry
+        {
+            UserId = userId,
+            ActionTypeId = actionTypeId,
+            Message = message,
+            DateCreated = DateTime.Now,
+        };
+        base.Add(log);
+        SaveChanges();
+    }
+
+    public IQueryable<LogEntry> GetAllLogs()
+    {
+        return LogEntries.Include(l => l.User).AsQueryable();
     }
 }

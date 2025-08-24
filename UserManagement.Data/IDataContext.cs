@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using UserManagement.Data.Entities;
+using static UserManagement.Data.Entities.LogEntry;
 
 namespace UserManagement.Data;
 
@@ -29,4 +30,9 @@ public interface IDataContext
     void Update<TEntity>(TEntity entity) where TEntity : class;
 
     void Delete<TEntity>(TEntity entity) where TEntity : class;
+
+    void AddLog(int userId, ActionType actionTypeId, string message);
+
+    IQueryable<LogEntry> GetAllLogs();
+
 }

@@ -1,0 +1,16 @@
+﻿@model UserManagement.Data.Entities.LogEntry
+@{
+    ViewData["Title"] = "Log Details";
+}
+
+<h2>Log Details</h2>
+
+<div class="card p-3 mb-3">
+    <p><strong>User:</strong> @Model.User?.Forename @Model.User?.Surname</p>
+    <p><strong>Action:</strong> @Model.ActionTypeId</p>
+@*     <p><strong>Performed By:</strong> @Model.UserId</p>
+ *@    <p><strong>Message:</strong> @Model.Message</p>
+    <p><strong>Timestamp:</strong> @Model.DateCreated.ToString("g")</p>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">Back to Logs</a>
