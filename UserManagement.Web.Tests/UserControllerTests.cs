@@ -1,7 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 using UserManagement.Data.Entities;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
@@ -22,7 +24,7 @@ namespace UserManagement.Data.Tests
         {
             var users = new[]
             {
-                new User { Id = 1, Forename = "Johnny", Surname = "User", Email = "juser@example.com", IsActive = true },
+                new User { Id = 1, Forename = "John", Surname = "Doe", Email = "jdoe@example.com", IsActive = true },
                 new User { Id = 2, Forename = "Inactive", Surname = "User", Email = "iuser@example.com", IsActive = false }
             };
 
@@ -126,15 +128,38 @@ namespace UserManagement.Data.Tests
         [Fact]
         public async Task View_ShouldReturnUserDetails_WhenUserExists()
         {
-            var controller = CreateController();
-            var users = SetupUsers();
+            // Arrange
+            var mockUserService = new Mock<IUserService>();
+            var mockLogService = new Mock<ILogService>();
 
+            var user = new User
+            {
+                Id = 1,
+                Forename = "John",
+                Surname = "Doe",
+                Email = "john.doe@example.com",
+                IsActive = true,
+                DateOfBirth = new DateOnly(2000, 1, 1)
+            };
+
+            mockUserService.Setup(s => s.ViewAsync(1))
+                .ReturnsAsync(user);
+
+            mockLogService.Setup(s => s.GetLogsForUserAsync(1))
+                .ReturnsAsync(new List<LogEntry>());
+
+            var controller = new UsersController(mockUserService.Object, mockLogService.Object);
+
+            // Act
             var result = await controller.View(1) as ViewResult;
 
+            // Assert
+            result.Should().NotBeNull();
             result!.ViewName.Should().Be("ViewUserDetails");
             result.Model.Should().BeOfType<AddEditUserViewModel>()
                 .Which.Id.Should().Be(1);
         }
+
 
         [Fact]
         public async Task Edit_Get_ShouldReturnEditView_WhenUserExists()
@@ -201,7 +226,7 @@ namespace UserManagement.Data.Tests
             result!.ViewName.Should().Be("ViewUserDetails");
             var model = result.Model.Should().BeOfType<AddEditUserViewModel>().Which;
             model.Id.Should().Be(1);
-            model.Forename.Should().Be("Johnny");
+            model.Forename.Should().Be("John");
 
             _userService.Verify(s => s.ViewAsync(1), Times.Once);
 
