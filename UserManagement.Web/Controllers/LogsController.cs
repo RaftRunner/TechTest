@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Data;
 using UserManagement.Data.Entities;
@@ -15,9 +15,11 @@ namespace UserManagement.Web.Controllers
             _dataContext = dataContext;
         }
 
-        public IActionResult Index(string searchUser = "", string actionFilter = "")
+        public async Task<IActionResult> Index(string searchUser = "", string actionFilter = "", int page = 1, int pageSize = 3)
         {
-            var logs = _dataContext.GetAll<LogEntry>().Include(l => l.User).AsQueryable();
+            var logs = _dataContext.GetAll<LogEntry>()
+                .Include(l => l.User)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchUser))
                 logs = logs.Where(l => l.User != null && l.User.Forename.Contains(searchUser));
@@ -25,19 +27,30 @@ namespace UserManagement.Web.Controllers
             if (!string.IsNullOrEmpty(actionFilter))
                 logs = logs.Where(l => l.ActionTypeId.ToString().Contains(actionFilter));
 
-            var logList = logs
-                .OrderByDescending(l => l.DateCreated)
-                .Take(100)
-                .ToList();
+            var totalLogs = await logs.CountAsync();
 
-            return View(logList); 
+            var logList = await logs
+                .OrderByDescending(l => l.DateCreated)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalLogs = totalLogs;
+            ViewBag.SearchUser = searchUser;
+            ViewBag.ActionFilter = actionFilter;
+
+            return View(logList);
         }
 
-        public IActionResult Details(long id)
+
+
+        public async Task<IActionResult> Details(long id)
         {
-            var log = _dataContext.GetAll<LogEntry>()
-                        .Include(l => l.User)
-                        .FirstOrDefault(l => l.Id == id);
+            var log = await _dataContext.GetAll<LogEntry>()
+                .Include(l => l.User)
+                .FirstOrDefaultAsync(l => l.Id == id);
 
             if (log == null) return NotFound();
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UserManagement.Data;
 using UserManagement.Data.Entities;
@@ -15,7 +14,8 @@ public class LogService : ILogService
     {
         _dataAccess = dataAccess;
     }
-    public void AddLog(long userId, LogEntry.ActionType actionTypeId, string message)
+
+    public async Task AddLogAsync(long userId, LogEntry.ActionType actionTypeId, string message)
     {
         var logEntry = new LogEntry()
         {
@@ -25,18 +25,22 @@ public class LogService : ILogService
             DateCreated = DateTime.Now,
         };
 
-        _dataAccess.Create(logEntry);
+        await _dataAccess.CreateAsync(logEntry);
     }
 
-    public IEnumerable<LogEntry> GetAllLogs()
+    public async Task<IEnumerable<LogEntry>> GetAllLogsAsync()
     {
-        return _dataAccess.GetAllLogs();
+        var logs = await _dataAccess.GetAllLogsAsync();
+        return logs.ToList();
     }
-    public IEnumerable<LogEntry> GetLogsForUser(long userId)
+
+    public async Task<IEnumerable<LogEntry>> GetLogsForUserAsync(long userId)
     {
-        return _dataAccess.GetAll<LogEntry>()
-            .Where(l => l.UserId == userId)
-            .OrderByDescending(l => l.DateCreated)
-            .ToList();
+        return await Task.FromResult(
+            _dataAccess.GetAll<LogEntry>()
+                .Where(l => l.UserId == userId)
+                .OrderByDescending(l => l.DateCreated)
+                .ToList()
+        );
     }
 }

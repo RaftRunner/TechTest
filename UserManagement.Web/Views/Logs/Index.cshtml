@@ -1,40 +1,78 @@
 ﻿@model IEnumerable<UserManagement.Data.Entities.LogEntry>
 @{
-    ViewData["Title"] = "Application Logs";
+	ViewData["Title"] = "Logs";
+	int totalPages = (int)Math.Ceiling((double)ViewBag.TotalLogs / ViewBag.PageSize);
+	int currentPage = ViewBag.CurrentPage;
 }
 
 <h2>Application Logs</h2>
 
 <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Action</th>
-            <th>Timestamp</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            @foreach (var log in Model)
-            {
-                <tr>
-                    <td>@log.User?.Forename @log.User?.Surname</td>
-                    <td>@log.ActionTypeId</td>
-                    <td>@log.DateCreated.ToString("g")</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@log.Id" class="btn btn-sm btn-info">View</a>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="5">Nothing has been logged yet... Try creating, updating, or deleting something...</td>
-            </tr>
-        }
-
-    </tbody>
+	<thead>
+		<tr>
+			<th>User</th>
+			<th>Action</th>
+			<th>Timestamp</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var log in Model)
+			{
+				<tr>
+					<td>@log.User?.Forename @log.User?.Surname</td>
+					<td>@log.ActionTypeId.ToString()</td>
+					<td>@log.DateCreated.ToString("g")</td>
+					<td>
+						<a asp-action="Details" asp-route-id="@log.Id" class="btn btn-sm btn-info">View</a>
+					</td>
+				</tr>
+			}
+		}
+		else
+		{
+			<tr>
+				<td colspan="5">Nothing has been logged yet...</td>
+			</tr>
+		}
+	</tbody>
 </table>
+
+@if (totalPages > 1)
+{
+	<nav aria-label="Page navigation">
+		<ul class="pagination">
+			<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+				<a class="page-link" asp-action="Index"
+				   asp-route-page="@(currentPage - 1)"
+				   asp-route-searchUser="@ViewBag.SearchUser"
+				   asp-route-actionFilter="@ViewBag.ActionFilter">
+					Previous
+				</a>
+			</li>
+
+			@for (int i = 1; i <= totalPages; i++)
+			{
+				<li class="page-item @(i == currentPage ? "active" : "")">
+					<a class="page-link" asp-action="Index"
+					   asp-route-page="@i"
+					   asp-route-searchUser="@ViewBag.SearchUser"
+					   asp-route-actionFilter="@ViewBag.ActionFilter">
+						@i
+					</a>
+				</li>
+			}
+
+			<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+				<a class="page-link" asp-action="Index"
+				   asp-route-page="@(currentPage + 1)"
+				   asp-route-searchUser="@ViewBag.SearchUser"
+				   asp-route-actionFilter="@ViewBag.ActionFilter">
+					Next
+				</a>
+			</li>
+		</ul>
+	</nav>
+}

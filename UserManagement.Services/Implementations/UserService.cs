@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using UserManagement.Data;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
@@ -18,33 +19,43 @@ public class UserService : IUserService
         _logService = logService;
     }
 
-    /// <summary>
-    /// Return users by active state
-    /// </summary>
-    /// <param name="isActive"></param>
-    /// <returns></returns>
-    public IEnumerable<User> FilterByActive(bool isActive)
+    public async Task<IEnumerable<User>> FilterByActiveAsync(bool isActive)
     {
-        throw new NotImplementedException();
+        return await Task.FromResult(
+            _dataAccess.GetAll<User>().Where(u => u.IsActive == isActive).ToList()
+        );
     }
 
-    public IEnumerable<User> GetAll() => _dataAccess.GetAll<User>();
+    public async Task<IEnumerable<User>> GetAllAsync()
+        => await Task.FromResult(_dataAccess.GetAll<User>().ToList());
 
-    public void Create(User user)
+    public async Task CreateAsync(User user)
     {
-        _logService.AddLog(user.Id, ActionType.Created, $"User {user.Id} Created");
-        _dataAccess.Create(user);
+        await _logService.AddLogAsync(user.Id, ActionType.Created, $"User {user.Id} Created");
+        await _dataAccess.CreateAsync(user);
     }
 
-    public void Update(User user)
+    public async Task UpdateAsync(User user)
     {
-        _logService.AddLog(user.Id, ActionType.Updated, $"User {user.Id} Updated");
-        _dataAccess.Update(user);
+        await _logService.AddLogAsync(user.Id, ActionType.Updated, $"User {user.Id} Updated");
+        await _dataAccess.UpdateAsync(user);
     }
 
-    public void Delete(User user)
+    public async Task DeleteAsync(User user)
     {
-        _logService.AddLog(user.Id, ActionType.Deleted, $"User {user.Id} Deleted");
-        _dataAccess.Delete(user);
+        await _logService.AddLogAsync(user.Id, ActionType.Deleted, $"User {user.Id} Deleted");
+        await _dataAccess.DeleteAsync(user);
+    }
+
+    public async Task<User?> ViewAsync(long userId)
+    {
+        var user = _dataAccess.GetAll<User>().FirstOrDefault(u => u.Id == userId);
+
+        if (user != null)
+        {
+            await _dataAccess.AddViewAsync(user.Id);
+        }
+
+        return user;
     }
 }
