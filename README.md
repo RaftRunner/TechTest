@@ -70,5 +70,6 @@ Add additional layers to the application that will ensure that it is scaleable w
 Things to note:
 * Added more tests
 * Added logs
+* Added paging on logs page, set to 3 per page for demo purposes
 * Chose to update the data access layer to support asynchronous operations and kept that structure where appropriate
-* 
+  
